@@ -101,8 +101,9 @@
 
   <script>
     async function initMap() {
-      const response = await fetch("https://script.google.com/macros/s/AKfycbzJJIagM6mqa-6wSObRiYWTFlN4i_Jt1lQgNIlyBrsVzPyLAr9tGVmJuBAFCgc-kAx-wQ/exec");
+      const response = await fetch("https://script.google.com/macros/s/AKfycbyYl4oN0kkSRwnBz9kVt1QZh_LUoil-8kpcVdRWZoMaAPWUzpqgv7QnNewBIxoY2cFuZQ/exec");
       const data = await response.json();
+
 
       // Initialize map zoomed on Asia
       const map = new google.maps.Map(document.getElementById("map"), {
