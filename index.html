@@ -125,7 +125,7 @@
       const totalSchools = data.length;
       let totalStudents = 0;
       data.forEach(row => {
-        const students = parseInt(row["Number of Students watching the video"]) || 0;
+        const students = parseInt(row["Number of individuals who watched the video"]) || 0;
         totalStudents += students;
       });
 
@@ -151,7 +151,7 @@
 data.forEach(row => {
   const lat = parseFloat(row["lat"]);
   const lng = parseFloat(row["lng"]);
-  const name = row["School Name"] || row["Address"];
+  const name = row["Name of the Organisation"] || row["Address"];
 
   if (!isNaN(lat) && !isNaN(lng)) {
     const marker = new google.maps.Marker({
