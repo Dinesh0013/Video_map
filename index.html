@@ -141,11 +141,6 @@
     }
     .info-card:hover { transform: translateY(-5px); }
 
-    #barChartContainer {
-      width: 90%;
-      margin: 0 auto 60px;
-    }
-
     @keyframes fadeInDown {
       from { opacity: 0; transform: translateY(-20px); }
       to { opacity: 1; transform: translateY(0); }
@@ -187,13 +182,6 @@
       <div>Click to access the Google Form:</div>
       <a href="https://forms.gle/Vt81efP2fELoPS5H7" target="_blank">Open Form</a>
       <div style="margin-top:20px;">Email: xyz@gmail.com</div>
-    </div>
-  </div>
-
-  <!-- Bar Graph Below -->
-  <div id="barChartContainer">
-    <div class="chart-box">
-      <canvas id="viewBarChart"></canvas>
     </div>
   </div>
 
@@ -300,40 +288,7 @@
         }
       });
 
-      // Bar chart
-      const viewerCounts = {};
-      data.forEach(row => {
-        const org = row["Name of the Organisation"] || row["Address"];
-        const viewers = parseInt(row["Number of individuals who watched the video"]) || 0;
-        viewerCounts[org] = viewers;
-      });
-
-      new Chart(document.getElementById('viewBarChart').getContext('2d'), {
-        type: 'bar',
-        data: {
-          labels: Object.keys(viewerCounts),
-          datasets: [{
-            label: 'Viewers',
-            data: Object.values(viewerCounts),
-            backgroundColor: '#007bff',
-            borderRadius: 6
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: { display: false },
-            tooltip: { backgroundColor: '#007bff', titleColor: '#fff', bodyColor: '#fff' }
-          },
-          scales: {
-            x: { ticks: { autoSkip: false, maxRotation: 90, minRotation: 45 }, grid: { display: false } },
-            y: { beginAtZero: true, grid: { color: '#e0e0e0' } }
-          }
-        }
-      });
-    }
-
-    window.onload = initMap;
+      window.onload = initMap;
   </script>
 </body>
 </html>
