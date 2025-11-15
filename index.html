@@ -164,7 +164,7 @@
   <header>
     <h1>🌍 Live Data Tracking for Video Reach</h1>
     <img src="assests/logo.jpg" id="topLogo" alt="Logo">
-    <div id="subText">Tracking real-time impact of the video across organizations</div>
+    <div id="subText">Tracking real-time impact of the video across izations</div>
   </header>
 
   <div id="counters">Schools: 0 | Students: 0</div>
@@ -176,7 +176,7 @@
     <div id="map"></div>
   </div>
 
-  <div id="schoolName">Hover over a pin to see the organization name</div>
+  <div id="schoolName">Hover over a pin to see the ization name</div>
 
   <!-- Pie + Info Card -->
   <div id="chartsContainer">
@@ -233,9 +233,9 @@
         frame++;
         displayOrgs = Math.floor((totalOrganizations / steps) * frame);
         displayViewers = Math.floor((totalViewers / steps) * frame);
-        countersEl.textContent = `🏢 Organizations: ${displayOrgs} | 👁️ Viewers: ${displayViewers}`;
+        countersEl.textContent = `🏢 Schools: ${displayOrgs} | 👁️ Students: ${displayViewers}`;
         if (frame >= steps) {
-          countersEl.textContent = `🏢 Organizations: ${totalOrganizations} | 👁️ Viewers: ${totalViewers}`;
+          countersEl.textContent = `🏢 Schools: ${totalOrganizations} | 👁️ Students: ${totalViewers}`;
           clearInterval(counterAnim);
         }
       }, 25);
