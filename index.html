@@ -28,18 +28,18 @@
     }
 
     #topLogo {
-  height: 70%;             /* Slightly smaller than header height for elegance */
-  width: auto;
-  position: absolute;
-  top: 50%;                 /* Center vertically in header */
-  right: 30px;              /* Some space from right edge */
-  transform: translateY(-50%); /* Perfect vertical centering */
-  border-radius: 12px;      /* Slight rounding to match header style */
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2); /* Soft shadow for depth */
-  background: rgba(255,255,255,0.1); /* Slight transparent overlay */
-  padding: 5px;             /* Small padding around logo */
-  object-fit: contain;      /* Keep proportions intact */
-  } 
+      height: 70%;
+      width: auto;
+      position: absolute;
+      top: 50%;
+      right: 30px;
+      transform: translateY(-50%);
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      background: rgba(255,255,255,0.1);
+      padding: 5px;
+      object-fit: contain;
+    }
 
     h1 {
       margin: 0;
@@ -67,7 +67,6 @@
       opacity: 0;
     }
 
-    /* Container for map + video side by side */
     #mainContent {
       display: flex;
       justify-content: center;
@@ -100,6 +99,53 @@
       opacity: 0;
     }
 
+    /* Charts + info layout */
+    #chartsContainer {
+      display: flex;
+      justify-content: flex-start;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin: 30px auto 60px;
+      width: 90%;
+    }
+
+    .chart-box {
+      width: 45%;
+      height: 260px;
+      background: #fff;
+      border-radius: 15px;
+      padding: 15px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: transform 0.3s ease;
+    }
+    .chart-box:hover { transform: translateY(-5px); }
+
+    .info-card {
+      width: 45%;
+      height: 260px;
+      background: linear-gradient(135deg, #f8f9fc, #e0f7ff);
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+      font-size: 1rem;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+    .info-card:hover { transform: translateY(-5px); }
+
+    #barChartContainer {
+      width: 90%;
+      margin: 0 auto 60px;
+    }
+
     @keyframes fadeInDown {
       from { opacity: 0; transform: translateY(-20px); }
       to { opacity: 1; transform: translateY(0); }
@@ -112,15 +158,16 @@
   </style>
 
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDRh15d9pIjXkDANjAfSIJBC6bMOy44ZWI"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <header>
     <h1>🌍 Live Data Tracking for Video Reach</h1>
     <img src="assests/logo.jpg" id="topLogo" alt="Logo">
-    <div id="subText">Tracking real-time impact of the video across schools</div>
+    <div id="subText">Tracking real-time impact of the video across organizations</div>
   </header>
 
-  <div id="counters">Schools: 0 | Students: 0</div>
+  <div id="counters">Organizations: 0 | Viewers: 0</div>
 
   <div id="mainContent">
     <div id="videoContainer">
@@ -129,7 +176,26 @@
     <div id="map"></div>
   </div>
 
-  <div id="schoolName">Hover over a pin to see the school name</div>
+  <div id="schoolName">Hover over a pin to see the organization name</div>
+
+  <!-- Pie + Info Card -->
+  <div id="chartsContainer">
+    <div class="chart-box">
+      <canvas id="orgPieChart"></canvas>
+    </div>
+    <div class="info-card">
+      <div>Click to access the Google Form:</div>
+      <a href="https://forms.gle/Vt81efP2fELoPS5H7" target="_blank">Open Form</a>
+      <div style="margin-top:20px;">Email: xyz@gmail.com</div>
+    </div>
+  </div>
+
+  <!-- Bar Graph Below -->
+  <div id="barChartContainer">
+    <div class="chart-box">
+      <canvas id="viewBarChart"></canvas>
+    </div>
+  </div>
 
   <script>
     async function initMap() {
@@ -151,35 +217,34 @@
       document.getElementById("map").style.animation = "fadeInUp 1.2s forwards";
       document.getElementById("schoolName").style.animation = "fadeInUp 1.4s forwards";
 
-      const totalSchools = data.length;
-      let totalStudents = 0;
+      const totalOrganizations = data.length;
+      let totalViewers = 0;
       data.forEach(row => {
-        const students = parseInt(row["Number of individuals who watched the video"]) || 0;
-        totalStudents += students;
+        const viewers = parseInt(row["Number of individuals who watched the video"]) || 0;
+        totalViewers += viewers;
       });
 
       const countersEl = document.getElementById("counters");
-      let displaySchools = 0;
-      let displayStudents = 0;
+      let displayOrgs = 0;
+      let displayViewers = 0;
       const steps = 60;
       let frame = 0;
-
       const counterAnim = setInterval(() => {
         frame++;
-        displaySchools = Math.floor((totalSchools / steps) * frame);
-        displayStudents = Math.floor((totalStudents / steps) * frame);
-        countersEl.textContent = `🏫 Schools: ${displaySchools} | 👩‍🎓 Students: ${displayStudents}`;
+        displayOrgs = Math.floor((totalOrganizations / steps) * frame);
+        displayViewers = Math.floor((totalViewers / steps) * frame);
+        countersEl.textContent = `🏢 Organizations: ${displayOrgs} | 👁️ Viewers: ${displayViewers}`;
         if (frame >= steps) {
-          countersEl.textContent = `🏫 Schools: ${totalSchools} | 👩‍🎓 Students: ${totalStudents}`;
+          countersEl.textContent = `🏢 Organizations: ${totalOrganizations} | 👁️ Viewers: ${totalViewers}`;
           clearInterval(counterAnim);
         }
       }, 25);
 
+      // Map markers
       data.forEach(row => {
         const lat = parseFloat(row["lat"]);
         const lng = parseFloat(row["lng"]);
         const name = row["Name of the Organisation"] || row["Address"];
-
         if (!isNaN(lat) && !isNaN(lng)) {
           const marker = new google.maps.Marker({
             position: { lat, lng },
@@ -205,6 +270,65 @@
 
           marker.addListener("mouseover", () => infoWindow.open(map, marker));
           marker.addListener("mouseout", () => infoWindow.close());
+        }
+      });
+
+      // Pie chart
+      const orgCounts = {};
+      data.forEach(row => {
+        const type = row["Type of organisation"] || "Other";
+        orgCounts[type] = (orgCounts[type] || 0) + 1;
+      });
+
+      new Chart(document.getElementById('orgPieChart').getContext('2d'), {
+        type: 'pie',
+        data: {
+          labels: Object.keys(orgCounts),
+          datasets: [{
+            data: Object.values(orgCounts),
+            backgroundColor: ['#007bff', '#00c6ff', '#ff7f50', '#ffc107', '#28a745', '#6f42c1'],
+            borderColor: '#fff',
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: 'bottom' },
+            tooltip: { mode: 'index', intersect: false }
+          }
+        }
+      });
+
+      // Bar chart
+      const viewerCounts = {};
+      data.forEach(row => {
+        const org = row["Name of the Organisation"] || row["Address"];
+        const viewers = parseInt(row["Number of individuals who watched the video"]) || 0;
+        viewerCounts[org] = viewers;
+      });
+
+      new Chart(document.getElementById('viewBarChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: Object.keys(viewerCounts),
+          datasets: [{
+            label: 'Viewers',
+            data: Object.values(viewerCounts),
+            backgroundColor: '#007bff',
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: { backgroundColor: '#007bff', titleColor: '#fff', bodyColor: '#fff' }
+          },
+          scales: {
+            x: { ticks: { autoSkip: false, maxRotation: 90, minRotation: 45 }, grid: { display: false } },
+            y: { beginAtZero: true, grid: { color: '#e0e0e0' } }
+          }
         }
       });
     }
