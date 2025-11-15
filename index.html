@@ -20,18 +20,25 @@
     header {
       background: linear-gradient(120deg, #007bff, #00c6ff);
       color: white;
-      padding: 40px 20px 60px;
+      padding: 20px 20px 20px 20px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.1);
       position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       opacity: 0;
       animation: fadeInDown 1s forwards;
     }
 
     #topLogo {
-      height: 70px;
+      height: 80px; /* Adjust height to match header size */
       width: auto;
-      display: block;
-      margin: 0 auto 10px auto;
+    }
+
+    .header-text {
+      text-align: left;
+      flex: 1;
+      margin-left: 20px;
     }
 
     h1 {
@@ -44,7 +51,7 @@
     #subText {
       font-size: 1.1rem;
       opacity: 0.9;
-      margin-top: 10px;
+      margin-top: 5px;
     }
 
     #counters {
@@ -60,7 +67,6 @@
       opacity: 0;
     }
 
-    /* Container for map + video side by side */
     #mainContent {
       display: flex;
       justify-content: center;
@@ -108,9 +114,12 @@
 </head>
 <body>
   <header>
+    <div class="header-text">
+      <h1>🌍 Live Data Tracking for Video Reach</h1>
+      <div id="subText">Tracking real-time impact of the video across schools</div>
+    </div>
+    <!-- Logo on right -->
     <img src="assets/Logo.jpg" id="topLogo" alt="Logo">
-    <h1>🌍 Live Data Tracking for Video Reach</h1>
-    <div id="subText">Tracking real-time impact of the video across schools</div>
   </header>
 
   <div id="counters">Schools: 0 | Students: 0</div>
