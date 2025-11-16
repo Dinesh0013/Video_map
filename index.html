@@ -27,6 +27,20 @@
       animation: fadeInDown 1s forwards;
     }
 
+    #topLogo {
+      height: 40%;
+      width: auto;
+      position: absolute;
+      top: 50%;
+      right: 30px;
+      transform: translateY(-50%);
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      background: rgba(255,255,255,0.1);
+      padding: 5px;
+      object-fit: contain;
+    }
+
     h1 {
       margin: 0;
       font-size: 2.4rem;
@@ -53,18 +67,29 @@
       opacity: 0;
     }
 
-    #map {
-      height: 70vh;
-      width: 80%;
+    #mainContent {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 20px;
+      flex-wrap: wrap;
       margin: 40px auto;
-      border-radius: 15px;
-      box-shadow: 0 6px 15px rgba(0,0,0,0.15);
-      opacity: 0;
+      width: 90%;
     }
 
-    #pieChartContainer {
-      width: 50%;
-      margin: 40px auto;
+    #map, #videoContainer {
+      width: 48%;
+      min-width: 300px;
+      height: 70vh;
+      border-radius: 15px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border-radius: 15px;
+      border: none;
     }
 
     #schoolName {
@@ -74,10 +99,53 @@
       opacity: 0;
     }
 
+    /* Charts + info layout */
+    #chartsContainer {
+      display: flex;
+      justify-content: flex-start;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin: 30px auto 60px;
+      width: 90%;
+    }
+
+    .chart-box {
+      width: 45%;
+      height: 260px;
+      background: #fff;
+      border-radius: 15px;
+      padding: 15px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: transform 0.3s ease;
+    }
+    .chart-box:hover { transform: translateY(-5px); }
+
+    .info-card {
+      width: 45%;
+      height: 260px;
+      background: linear-gradient(135deg, #f8f9fc, #e0f7ff);
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+      font-size: 1rem;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+    .info-card:hover { transform: translateY(-5px); }
+
     @keyframes fadeInDown {
       from { opacity: 0; transform: translateY(-20px); }
       to { opacity: 1; transform: translateY(0); }
     }
+
     @keyframes fadeInUp {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
@@ -90,29 +158,55 @@
 <body>
   <header>
     <h1>🌍 Live Data Tracking for Video Reach</h1>
-    <div id="subText">Tracking real-time impact of the video across schools</div>
+    <img src="assests/logo.jpg" id="topLogo" alt="Logo">
+    <div id="subText">Tracking real-time impact of the video across izations</div>
   </header>
 
-  <div id="counters">Schools: 0 | Students: 0</div>
-  <div id="map"></div>
-  <div id="schoolName">Hover over a pin to see the school name</div>
+  <div id="counters">Organizations: 0 | Viewers: 0</div>
 
-  <!-- Pie chart container -->
-  <div id="pieChartContainer">
-    <canvas id="orgTypeChart"></canvas>
+  <div id="mainContent">
+    <div id="videoContainer">
+      <iframe src="https://www.youtube.com/embed/JvEGXiQcYPI" allowfullscreen></iframe>
+    </div>
+    <div id="map"></div>
   </div>
+
+  <div id="schoolName">Hover over a pin to see the organization name</div>
+  <!-- Pie + Info Card -->
+  <div id="chartsContainer">
+    <div class="chart-box">
+      <canvas id="orgPieChart"></canvas>
+    </div>
+ <div class="info-card" style="text-align: center; padding: 20px; height: 260px;">
+  <h3 style="margin-bottom: 15px; color:#007bff;">🌟 Join the Change!</h3>
+  
+  <p style="margin-bottom: 20px; font-size: 0.95rem; line-height: 1.5; max-width: 280px; margin-left: auto; margin-right: auto;">
+    Fill this form (takes less than a minute) to <strong>mark your organisation</strong> on the map <br>
+    and be part of a growing impact. 🚀
+  </p>
+  
+  <a href="https://forms.gle/Vt81efP2fELoPS5H7" target="_blank" 
+     style="display:inline-block; padding:10px 25px; background:#007bff; color:#fff; border-radius:8px; text-decoration:none; font-weight:600; transition:0.3s; margin-bottom: 10px;">
+    Open Form
+  </a>
+  
+  <p style="margin-top:10px; font-size:0.85rem; color:#555;">
+    For any queries or feedback: n.sangwan@qub.ac.uk
+  </p>
+</div>
+
+
 
   <script>
     async function initMap() {
       const response = await fetch("https://script.google.com/macros/s/AKfycbzJJIagM6mqa-6wSObRiYWTFlN4i_Jt1lQgNIlyBrsVzPyLAr9tGVmJuBAFCgc-kAx-wQ/exec");
       const data = await response.json();
 
-      // Initialize map
       const map = new google.maps.Map(document.getElementById("map"), {
         zoom: 4,
         center: { lat: 23.5, lng: 80 },
         minZoom: 2,
-        maxZoom: 10,
+        maxZoom: 20,
         styles: [
           { featureType: "poi", stylers: [{ visibility: "off" }] },
           { featureType: "road", stylers: [{ visibility: "simplified" }] },
@@ -123,36 +217,30 @@
       document.getElementById("map").style.animation = "fadeInUp 1.2s forwards";
       document.getElementById("schoolName").style.animation = "fadeInUp 1.4s forwards";
 
-      // Totals
-      const totalSchools = data.length;
-      let totalStudents = 0;
-      const orgCounts = {}; // For pie chart
+      const totalOrganizations = data.length;
+      let totalViewers = 0;
       data.forEach(row => {
-        const students = parseInt(row["Number of individuals who watched the video"]) || 0;
-        totalStudents += students;
-
-        const orgType = row["Type of organisation"] || "Unknown";
-        orgCounts[orgType] = (orgCounts[orgType] || 0) + 1;
+        const viewers = parseInt(row["Number of individuals who watched the video"]) || 0;
+        totalViewers += viewers;
       });
 
-      // Animate counters
       const countersEl = document.getElementById("counters");
-      let displaySchools = 0;
-      let displayStudents = 0;
+      let displayOrgs = 0;
+      let displayViewers = 0;
       const steps = 60;
       let frame = 0;
       const counterAnim = setInterval(() => {
         frame++;
-        displaySchools = Math.floor((totalSchools / steps) * frame);
-        displayStudents = Math.floor((totalStudents / steps) * frame);
-        countersEl.textContent = `🏫 Schools: ${displaySchools} | 👩‍🎓 Students: ${displayStudents}`;
+        displayOrgs = Math.floor((totalOrganizations / steps) * frame);
+        displayViewers = Math.floor((totalViewers / steps) * frame);
+        countersEl.textContent = `🏢 Schools: ${displayOrgs} | 👁️ Students: ${displayViewers}`;
         if (frame >= steps) {
-          countersEl.textContent = `🏫 Schools: ${totalSchools} | 👩‍🎓 Students: ${totalStudents}`;
+          countersEl.textContent = `🏢 Schools: ${totalOrganizations} | 👁️ Students: ${totalViewers}`;
           clearInterval(counterAnim);
         }
       }, 25);
 
-      // Add markers
+      // Map markers
       data.forEach(row => {
         const lat = parseFloat(row["lat"]);
         const lng = parseFloat(row["lng"]);
@@ -166,7 +254,17 @@
           });
 
           const infoWindow = new google.maps.InfoWindow({
-            content: `<div style="font-size:18px;font-weight:700;font-family:'Inter',sans-serif;color:#1a1a1a;background: rgba(255,255,255,0.95);padding: 10px 15px;border-radius: 10px;box-shadow: 0 4px 12px rgba(0,0,0,0.2);text-align:center;">${name}</div>`,
+            content: `<div style="
+              font-size:18px;
+              font-weight:700;
+              font-family:'Inter', sans-serif;
+              color:#1a1a1a;
+              background: rgba(255,255,255,0.95);
+              padding: 10px 15px;
+              border-radius: 10px;
+              box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+              text-align:center;
+            ">${name}</div>`,
             disableAutoPan: true
           });
 
@@ -175,18 +273,20 @@
         }
       });
 
-      // Render pie chart
-      const ctx = document.getElementById('orgTypeChart').getContext('2d');
-      new Chart(ctx, {
+      // Pie chart
+      const orgCounts = {};
+      data.forEach(row => {
+        const type = row["Type of organisation"] || "Other";
+        orgCounts[type] = (orgCounts[type] || 0) + 1;
+      });
+
+      new Chart(document.getElementById('orgPieChart').getContext('2d'), {
         type: 'pie',
         data: {
           labels: Object.keys(orgCounts),
           datasets: [{
-            label: 'Organization Type Count',
             data: Object.values(orgCounts),
-            backgroundColor: [
-              '#007bff','#00c6ff','#ff6384','#ff9f40','#4bc0c0','#9966ff','#ffcd56'
-            ],
+            backgroundColor: ['#007bff', '#00c6ff', '#ff7f50', '#ffc107', '#28a745', '#6f42c1'],
             borderColor: '#fff',
             borderWidth: 2
           }]
@@ -194,19 +294,8 @@
         options: {
           responsive: true,
           plugins: {
-            legend: {
-              position: 'bottom',
-              labels: {
-                font: { size: 14 }
-              }
-            },
-            tooltip: {
-              callbacks: {
-                label: function(context) {
-                  return `${context.label}: ${context.raw}`;
-                }
-              }
-            }
+            legend: { position: 'bottom' },
+            tooltip: { mode: 'index', intersect: false }
           }
         }
       });
