@@ -18,8 +18,6 @@
       --canopy: #1e6b52;
       --canopy-dark: #14503d;
       --canopy-soft: #dceae3;
-      --haze: #9db9c0;
-      --haze-dark: #7ba0aa;
       --warn-bg: #fff4d6;
       --warn-ink: #6b4b00;
       --radius: 8px;
@@ -237,29 +235,6 @@
     }
 
     /* ---------- Growth ---------- */
-    .segmented {
-      display: inline-flex;
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      overflow: hidden;
-    }
-    .segmented button {
-      padding: 8px 14px;
-      border: 0;
-      border-left: 1px solid var(--line);
-      background: #fff;
-      color: var(--ink-soft);
-      font: 500 0.88rem var(--sans);
-      cursor: pointer;
-      transition: background-color 0.15s ease, color 0.15s ease;
-    }
-    .segmented button:first-child { border-left: 0; }
-    .segmented button:hover { background: var(--canopy-soft); }
-    .segmented button[aria-pressed="true"] {
-      background: var(--ink);
-      color: #fff;
-    }
-
     .growth-stats {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -477,11 +452,6 @@
           <h2 id="growthTitle">Monthly student growth</h2>
           <p>Students who have watched the video, calculated from each submission's date.</p>
         </div>
-        <div class="segmented" role="group" aria-label="Chart view">
-          <button type="button" data-view="both" aria-pressed="true">Both</button>
-          <button type="button" data-view="total" aria-pressed="false">Running total</button>
-          <button type="button" data-view="monthly" aria-pressed="false">Added each month</button>
-        </div>
       </div>
 
       <dl class="growth-stats">
@@ -494,7 +464,7 @@
 
       <div id="growthContent">
         <div class="chart-area">
-          <div class="chart-canvas"><canvas id="growthChart" role="img" aria-label="Chart of students who watched the video, by month"></canvas></div>
+          <div class="chart-canvas"><canvas id="growthChart" role="img" aria-label="Running total of students who watched the video, by month"></canvas></div>
         </div>
         <div class="table-wrap">
           <table>
@@ -550,8 +520,6 @@
     const COLORS = {
       canopy: "#1e6b52",
       canopySoft: "rgba(30, 107, 82, 0.12)",
-      haze: "#9db9c0",
-      hazeDark: "#7ba0aa",
       ink: "#14262e",
       muted: "#5b6e77",
       grid: "#e3eaec"
@@ -576,7 +544,6 @@
     let markers = [];
     let typeChart = null;
     let growthChart = null;
-    let growthView = "both";
     let latestSeries = [];
 
     const $ = id => document.getElementById(id);
@@ -877,16 +844,6 @@
       });
     }
 
-    function applyGrowthView() {
-      document.querySelectorAll(".segmented button").forEach(button => {
-        button.setAttribute("aria-pressed", String(button.dataset.view === growthView));
-      });
-      if (!growthChart) return;
-      growthChart.setDatasetVisibility(0, growthView !== "total");
-      growthChart.setDatasetVisibility(1, growthView !== "monthly");
-      growthChart.update();
-    }
-
     function renderGrowthTable(series) {
       const body = $("growthRows");
       body.textContent = "";
@@ -931,19 +888,17 @@
       renderGrowthTable(series);
 
       const labels = series.map(item => monthShort.format(item.date));
-      const added = series.map(item => item.added);
       const totals = series.map(item => item.total);
       const latest = series[series.length - 1];
       $("growthChart").setAttribute(
         "aria-label",
-        "Chart of students who watched the video by month, from " + labels[0] + " to " +
+        "Chart of the running total of students who watched the video, from " + labels[0] + " to " +
           labels[labels.length - 1] + ". The running total reaches " + formatNumber(latest.total) + " students."
       );
 
       if (growthChart) {
         growthChart.data.labels = labels;
-        growthChart.data.datasets[0].data = added;
-        growthChart.data.datasets[1].data = totals;
+        growthChart.data.datasets[0].data = totals;
         growthChart.update();
         return;
       }
@@ -952,16 +907,6 @@
         data: {
           labels,
           datasets: [
-            {
-              type: "bar",
-              label: "Students added in the month",
-              data: added,
-              backgroundColor: COLORS.haze,
-              hoverBackgroundColor: COLORS.hazeDark,
-              borderRadius: 3,
-              maxBarThickness: 44,
-              order: 2
-            },
             {
               type: "line",
               label: "Running total",
@@ -974,8 +919,7 @@
               pointHoverRadius: 6,
               pointBackgroundColor: "#ffffff",
               pointBorderColor: COLORS.canopy,
-              pointBorderWidth: 2,
-              order: 1
+              pointBorderWidth: 2
             }
           ]
         },
@@ -994,21 +938,20 @@
             }
           },
           plugins: {
-            legend: { position: "bottom", labels: { usePointStyle: true, boxWidth: 8, color: COLORS.ink } },
+            legend: { display: false },
             tooltip: {
               callbacks: {
                 title: items => monthLong.format(latestSeries[items[0].dataIndex].date),
                 label: ctx => " " + ctx.dataset.label + ": " + formatNumber(ctx.parsed.y),
                 footer: items => {
                   const item = latestSeries[items[0].dataIndex];
-                  return "Schools added: " + formatNumber(item.schools) + "\nGrowth on previous total: " + formatGrowth(item.growth);
+                  return "Students added: " + formatNumber(item.added) + "\nSchools added: " + formatNumber(item.schools) + "\nGrowth on previous total: " + formatGrowth(item.growth);
                 }
               }
             }
           }
         }
       });
-      applyGrowthView();
     }
 
     function render(data) {
@@ -1046,13 +989,6 @@
     }
 
     async function start() {
-      document.querySelectorAll(".segmented button").forEach(button => {
-        button.addEventListener("click", () => {
-          growthView = button.dataset.view;
-          applyGrowthView();
-        });
-      });
-
       initMap();
       const data = await loadData();
       if (data) render(data);
