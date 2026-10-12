@@ -4,162 +4,388 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Live Video Reach Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" />
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    :root {
+      --ink: #14262e;
+      --ink-soft: #2b414b;
+      --muted: #5b6e77;
+      --line: #d5dee1;
+      --bg: #edf1f2;
+      --panel: #ffffff;
+      --canopy: #1e6b52;
+      --canopy-dark: #14503d;
+      --canopy-soft: #dceae3;
+      --haze: #9db9c0;
+      --haze-dark: #7ba0aa;
+      --warn-bg: #fff4d6;
+      --warn-ink: #6b4b00;
+      --radius: 8px;
+      --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+      --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
 
     body {
-      font-family: 'Inter', sans-serif;
-      background: #f8f9fc;
       margin: 0;
-      padding: 0;
-      text-align: center;
-      color: #222;
-      overflow-x: hidden;
+      font-family: var(--sans);
+      font-size: 1rem;
+      line-height: 1.55;
+      color: var(--ink);
+      background: var(--bg);
     }
 
-    header {
-      background: linear-gradient(120deg, #007bff, #00c6ff);
-      color: white;
-      padding: 40px 20px 60px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-      position: relative;
-      opacity: 0;
-      animation: fadeInDown 1s forwards;
+    h1, h2, h3, p { margin: 0; }
+
+    :focus-visible {
+      outline: 3px solid var(--canopy);
+      outline-offset: 2px;
     }
 
-    #topLogo {
-      height: 20%;
-      width: auto;
+    .skip-link {
       position: absolute;
-      top: 50%;
-      right: 30px;
-      transform: translateY(-50%);
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-      background: rgba(255,255,255,0.1);
-      padding: 5px;
-      object-fit: contain;
+      left: 16px;
+      top: -48px;
+      padding: 8px 14px;
+      background: var(--panel);
+      color: var(--ink);
+      border-radius: 6px;
+      z-index: 10;
+    }
+    .skip-link:focus { top: 12px; }
+
+    .wrap {
+      width: 100%;
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 0 24px;
     }
 
-    h1 {
-      margin: 0;
-      font-size: 2.4rem;
-      font-weight: 700;
-      letter-spacing: 0.5px;
+    /* ---------- Header ---------- */
+    .hero {
+      background: var(--ink);
+      color: #fff;
+      padding-top: 24px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-chip {
+      display: flex;
+      align-items: center;
+      padding: 6px 8px;
+      background: #fff;
+      border-radius: 6px;
+    }
+    #topLogo { display: block; height: 40px; width: auto; }
+
+    .brand {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #c9d8dd;
+    }
+
+    .hero-body { padding: 56px 0 104px; }
+
+    .hero h1 {
+      font-family: var(--serif);
+      font-weight: 600;
+      font-size: clamp(2rem, 4.6vw, 3rem);
+      line-height: 1.12;
+      letter-spacing: -0.01em;
+      max-width: 20ch;
     }
 
     #subText {
-      font-size: 1.1rem;
-      opacity: 0.9;
-      margin-top: 10px;
+      margin-top: 16px;
+      max-width: 58ch;
+      font-size: 1.05rem;
+      color: #b9cbd1;
     }
 
-    #counters {
-      font-size: 1.8rem;
-      font-weight: 700;
-      color: #333;
-      background: #fff;
-      border-radius: 15px;
-      padding: 20px;
-      display: inline-block;
-      margin-top: -30px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      opacity: 0;
-    }
-
-    #mainContent {
+    /* India AQI bands: good, satisfactory, moderate, poor, very poor, severe */
+    .aqi-ribbon {
       display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      gap: 20px;
-      flex-wrap: wrap;
-      margin: 40px auto;
-      width: 90%;
+      height: 6px;
+    }
+    .aqi-ribbon span { flex: 1; }
+    .aqi-ribbon span:nth-child(1) { background: #00b050; }
+    .aqi-ribbon span:nth-child(2) { background: #92d050; }
+    .aqi-ribbon span:nth-child(3) { background: #ffd500; }
+    .aqi-ribbon span:nth-child(4) { background: #f79646; }
+    .aqi-ribbon span:nth-child(5) { background: #ff0000; }
+    .aqi-ribbon span:nth-child(6) { background: #c00000; }
+
+    /* ---------- Counters ---------- */
+    #counters {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      margin-top: -64px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
     }
 
-    #map, #videoContainer {
-      width: 48%;
-      min-width: 300px;
-      height: 70vh;
-      border-radius: 15px;
-      box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+    .kpi {
+      padding: 22px 26px 24px;
+      border-left: 1px solid var(--line);
+      min-width: 0;
+    }
+    .kpi:first-child { border-left: 0; }
+
+    .kpi-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--muted);
+    }
+    .kpi-label svg { flex: none; color: var(--canopy); }
+
+    .kpi-value {
+      margin-top: 8px;
+      font-family: var(--serif);
+      font-weight: 600;
+      font-size: clamp(1.9rem, 3.4vw, 2.7rem);
+      line-height: 1.1;
+      font-variant-numeric: tabular-nums lining-nums;
+      overflow-wrap: anywhere;
     }
 
-    iframe {
-      width: 100%;
-      height: 100%;
-      border-radius: 15px;
-      border: none;
+    .kpi-note {
+      margin-top: 4px;
+      font-size: 0.85rem;
+      color: var(--muted);
     }
 
     #loadError {
-      margin: 20px auto 0;
-      max-width: 600px;
+      margin-top: 20px;
       padding: 12px 16px;
-      border-radius: 10px;
-      background: #fff3cd;
-      color: #664d03;
+      border-radius: 6px;
+      background: var(--warn-bg);
+      color: var(--warn-ink);
       font-size: 0.95rem;
     }
     #loadError[hidden] { display: none; }
 
-    #schoolName {
-      font-size: 1.2rem;
-      color: #333;
-      margin-bottom: 30px;
-      opacity: 0;
+    /* ---------- Panels ---------- */
+    main { padding-bottom: 24px; }
+
+    .section-gap { margin-top: 24px; }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
     }
 
-    /* Charts + info layout */
-    #chartsContainer {
+    .panel-head {
       display: flex;
-      justify-content: flex-start;
-      gap: 20px;
       flex-wrap: wrap;
-      margin: 30px auto 60px;
-      width: 90%;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--line);
     }
 
-    .chart-box {
-      width: 45%;
-      height: 260px;
+    .panel-head h2 {
+      font-family: var(--serif);
+      font-weight: 600;
+      font-size: 1.25rem;
+      line-height: 1.25;
+    }
+    .panel-head p {
+      margin-top: 2px;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 40px;
+    }
+    .split.split-tight { margin-top: 24px; }
+
+    .media {
+      height: clamp(320px, 52vh, 520px);
+      background: #e3eaec;
+    }
+    #map, .media iframe {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    #schoolName {
+      padding: 12px 22px;
+      border-top: 1px solid var(--line);
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    /* ---------- Growth ---------- */
+    .segmented {
+      display: inline-flex;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .segmented button {
+      padding: 8px 14px;
+      border: 0;
+      border-left: 1px solid var(--line);
       background: #fff;
-      border-radius: 15px;
-      padding: 15px;
-      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      transition: transform 0.3s ease;
+      color: var(--ink-soft);
+      font: 500 0.88rem var(--sans);
+      cursor: pointer;
+      transition: background-color 0.15s ease, color 0.15s ease;
     }
-    .chart-box:hover { transform: translateY(-5px); }
+    .segmented button:first-child { border-left: 0; }
+    .segmented button:hover { background: var(--canopy-soft); }
+    .segmented button[aria-pressed="true"] {
+      background: var(--ink);
+      color: #fff;
+    }
 
-    .info-card {
-      width: 45%;
-      height: 260px;
-      background: linear-gradient(135deg, #f8f9fc, #e0f7ff);
-      border-radius: 15px;
-      padding: 20px;
-      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-      font-size: 1rem;
-      color: #333;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
+    .growth-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      margin: 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .growth-stat {
+      padding: 16px 22px;
+      border-left: 1px solid var(--line);
+      min-width: 0;
+    }
+    .growth-stat:first-child { border-left: 0; }
+    .growth-stat dt { font-size: 0.88rem; color: var(--muted); }
+    .growth-stat dd {
+      margin: 2px 0 0;
+      font-family: var(--serif);
+      font-weight: 600;
+      font-size: 1.35rem;
+      font-variant-numeric: tabular-nums lining-nums;
+    }
+
+    .chart-area { padding: 20px 22px 8px; }
+    .chart-canvas { position: relative; height: 340px; }
+
+    #growthEmpty {
+      padding: 48px 22px;
       text-align: center;
-      transition: transform 0.3s ease;
+      color: var(--muted);
     }
-    .info-card:hover { transform: translateY(-5px); }
+    #growthEmpty[hidden], #growthContent[hidden] { display: none; }
 
-    @keyframes fadeInDown {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
+    .table-wrap {
+      max-height: 320px;
+      overflow: auto;
+      margin: 12px 22px 22px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+    caption {
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 500;
+      color: var(--ink-soft);
+      background: #f6f9f9;
+      border-bottom: 1px solid var(--line);
+    }
+    th, td {
+      padding: 9px 14px;
+      text-align: right;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums lining-nums;
+    }
+    th:first-child, td:first-child { text-align: left; }
+    thead th {
+      position: sticky;
+      top: 0;
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+      font-weight: 600;
+      color: var(--ink-soft);
+    }
+    tbody tr + tr td { border-top: 1px solid #e8eef0; }
+    tbody tr:hover { background: #f3f7f7; }
+    td.positive { color: var(--canopy-dark); font-weight: 500; }
+
+    /* ---------- Lower row ---------- */
+    .chart-box {
+      position: relative;
+      height: 260px;
+      padding: 16px 22px 20px;
     }
 
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+    .join { background: var(--canopy-soft); border-color: #bfd9cd; }
+    .join .panel-head { border-bottom-color: #bfd9cd; }
+    .join-body { padding: 20px 22px 24px; }
+    .join-body p { max-width: 46ch; color: var(--ink-soft); }
+
+    .button {
+      display: inline-block;
+      margin-top: 18px;
+      padding: 11px 22px;
+      border-radius: 6px;
+      background: var(--canopy);
+      color: #fff;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background-color 0.15s ease;
+    }
+    .button:hover { background: var(--canopy-dark); }
+
+    footer {
+      margin-top: 24px;
+      padding: 24px 0 40px;
+      border-top: 1px solid var(--line);
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    footer a { color: var(--canopy-dark); }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 900px) {
+      .split { grid-template-columns: 1fr; margin-top: 24px; }
+      #counters { grid-template-columns: repeat(2, 1fr); }
+      .kpi:nth-child(3) { border-left: 0; }
+      .kpi:nth-child(n+3) { border-top: 1px solid var(--line); }
+    }
+
+    @media (max-width: 600px) {
+      .wrap { padding: 0 16px; }
+      .hero-body { padding: 40px 0 96px; }
+      .kpi { padding: 16px 16px 18px; }
+      .panel-head { padding: 16px; }
+      .chart-area { padding: 16px 12px 8px; }
+      .chart-canvas { height: 300px; }
+      .growth-stats { grid-template-columns: 1fr; }
+      .growth-stat { border-left: 0; border-top: 1px solid var(--line); padding: 12px 16px; }
+      .growth-stat:first-child { border-top: 0; }
+      .table-wrap { margin: 12px 16px 16px; }
+      #schoolName { padding: 12px 16px; }
+      .chart-box { padding: 12px 16px 16px; }
+      .join-body { padding: 16px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; }
     }
   </style>
 
@@ -167,60 +393,205 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
-  <header>
-    <h1>🌍 Live Data Tracking for Video Reach</h1>
-    <img src="assets/logo.jpg" id="topLogo" alt="Logo">
-    <div id="subText">Tracking real-time impact of the video across organizations</div>
+  <a class="skip-link" href="#dashboard">Skip to the dashboard</a>
+
+  <div class="aqi-ribbon" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+
+  <header class="hero">
+    <div class="wrap">
+      <div class="topbar">
+        <div class="logo-chip"><img src="assets/logo.jpg" id="topLogo" alt="Queen's University Belfast logo" /></div>
+        <span class="brand">Video Reach Tracker</span>
+      </div>
+      <div class="hero-body">
+        <h1>Live Data Tracking for Video Reach</h1>
+        <p id="subText">Tracking real-time impact of the air pollution awareness video across schools and organisations in India.</p>
+      </div>
+    </div>
   </header>
 
-  <div id="counters">🏢 Schools: 0 | 👁️ Students: 0</div>
-  <div id="loadError" role="alert" hidden></div>
+  <main id="dashboard" class="wrap">
+    <section id="counters" aria-label="Headline figures">
+      <div class="kpi">
+        <div class="kpi-label">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18"/><path d="M5 21V9l7-5 7 5v12"/><path d="M10 21v-5h4v5"/></svg>
+          Schools
+        </div>
+        <div class="kpi-value" id="kpiSchools">0</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8"/><path d="M18 14.3c2.2.6 3.5 2.6 3.5 5.7"/></svg>
+          Students
+        </div>
+        <div class="kpi-value" id="kpiStudents">0</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>
+          <span id="kpiMonthLabel">Added this month</span>
+        </div>
+        <div class="kpi-value" id="kpiMonth">0</div>
+        <div class="kpi-note" id="kpiMonthNote"></div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 3v4"/><path d="M16 3v4"/></svg>
+          Tracking since
+        </div>
+        <div class="kpi-value" id="kpiSince">&ndash;</div>
+        <div class="kpi-note" id="kpiSinceNote"></div>
+      </div>
+    </section>
 
-  <div id="mainContent">
-    <div id="videoContainer">
-      <iframe src="https://www.youtube.com/embed/JvEGXiQcYPI" allowfullscreen></iframe>
+    <div id="loadError" role="alert" hidden></div>
+
+    <div class="split">
+      <section class="panel" aria-labelledby="videoTitle">
+        <div class="panel-head">
+          <div>
+            <h2 id="videoTitle">Watch the video</h2>
+            <p>The video shown to students in participating schools.</p>
+          </div>
+        </div>
+        <div class="media" id="videoContainer">
+          <iframe src="https://www.youtube.com/embed/JvEGXiQcYPI" title="Air pollution awareness video" allowfullscreen></iframe>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="mapTitle">
+        <div class="panel-head">
+          <div>
+            <h2 id="mapTitle">Where it has been watched</h2>
+            <p>Each pin is a participating school or organisation.</p>
+          </div>
+        </div>
+        <div class="media"><div id="map" role="region" aria-label="Map of participating schools"></div></div>
+        <div id="schoolName">Hover over a pin to see the organisation name</div>
+      </section>
     </div>
-    <div id="map"></div>
-  </div>
 
-  <div id="schoolName">Hover over a pin to see the organization name</div>
-  <!-- Pie + Info Card -->
-  <div id="chartsContainer">
-    <div class="chart-box">
-      <canvas id="orgPieChart"></canvas>
+    <section class="panel section-gap" aria-labelledby="growthTitle">
+      <div class="panel-head">
+        <div>
+          <h2 id="growthTitle">Monthly student growth</h2>
+          <p>Students who have watched the video, calculated from each submission's date.</p>
+        </div>
+        <div class="segmented" role="group" aria-label="Chart view">
+          <button type="button" data-view="both" aria-pressed="true">Both</button>
+          <button type="button" data-view="total" aria-pressed="false">Running total</button>
+          <button type="button" data-view="monthly" aria-pressed="false">Added each month</button>
+        </div>
+      </div>
+
+      <dl class="growth-stats">
+        <div class="growth-stat"><dt>Total students</dt><dd id="gsTotal">&ndash;</dd></div>
+        <div class="growth-stat"><dt id="gsLatestLabel">Added this month</dt><dd id="gsLatest">&ndash;</dd></div>
+        <div class="growth-stat"><dt>Strongest month</dt><dd id="gsPeak">&ndash;</dd></div>
+      </dl>
+
+      <div id="growthEmpty" hidden>No dated submissions yet, so there is nothing to chart. The chart appears as soon as the first response arrives.</div>
+
+      <div id="growthContent">
+        <div class="chart-area">
+          <div class="chart-canvas"><canvas id="growthChart" role="img" aria-label="Chart of students who watched the video, by month"></canvas></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <caption>Monthly figures</caption>
+            <thead>
+              <tr><th scope="col">Month</th><th scope="col">Schools added</th><th scope="col">Students added</th><th scope="col">Running total</th><th scope="col">Growth</th></tr>
+            </thead>
+            <tbody id="growthRows"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <div class="split split-tight">
+      <section class="panel" aria-labelledby="typeTitle">
+        <div class="panel-head">
+          <div>
+            <h2 id="typeTitle">Who is taking part</h2>
+            <p>Participating organisations by type.</p>
+          </div>
+        </div>
+        <div class="chart-box"><canvas id="orgPieChart" role="img" aria-label="Participating organisations by type"></canvas></div>
+      </section>
+
+      <section class="panel join" aria-labelledby="joinTitle">
+        <div class="panel-head">
+          <div>
+            <h2 id="joinTitle">Add your school to the map</h2>
+            <p>Takes less than a minute.</p>
+          </div>
+        </div>
+        <div class="join-body">
+          <p>Fill in the form to mark your organisation on the map and be part of a growing impact.</p>
+          <a class="button" href="https://forms.gle/Vt81efP2fELoPS5H7" target="_blank" rel="noopener">Open the form</a>
+        </div>
+      </section>
     </div>
- <div class="info-card" style="text-align: center; padding: 20px; height: 260px;">
-  <h3 style="margin-bottom: 15px; color:#007bff;">🌟 Join the Change!</h3>
-  
-  <p style="margin-bottom: 20px; font-size: 0.95rem; line-height: 1.5; max-width: 280px; margin-left: auto; margin-right: auto;">
-    Fill this form (takes less than a minute) to <strong>mark your organisation</strong> on the map <br>
-    and be part of a growing impact. 🚀
-  </p>
-  
-  <a href="https://forms.gle/Vt81efP2fELoPS5H7" target="_blank" 
-     style="display:inline-block; padding:10px 25px; background:#007bff; color:#fff; border-radius:8px; text-decoration:none; font-weight:600; transition:0.3s; margin-bottom: 10px;">
-    Open Form
-  </a>
-  
-  <p style="margin-top:10px; font-size:0.85rem; color:#555;">
-    For any queries or feedback: n.sangwan@qub.ac.uk
-  </p>
-</div>
-  </div>
+  </main>
 
-
+  <footer>
+    <div class="wrap">For any queries or feedback: <a href="mailto:n.sangwan@qub.ac.uk">n.sangwan@qub.ac.uk</a></div>
+  </footer>
 
   <script>
     const DATA_URL = "https://script.google.com/macros/s/AKfycbzJJIagM6mqa-6wSObRiYWTFlN4i_Jt1lQgNIlyBrsVzPyLAr9tGVmJuBAFCgc-kAx-wQ/exec";
     const CACHE_KEY = "videoReachData";
     const FETCH_TIMEOUT_MS = 15000;
+    const REFRESH_MS = 5 * 60 * 1000;
     const MAX_PLAUSIBLE_VIEWERS = 20000;
     const WORD_NUMBERS = { zero: 0, one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10 };
+    const VIEWERS_KEY = "Number of individuals who watched the video";
+
+    const COLORS = {
+      canopy: "#1e6b52",
+      canopySoft: "rgba(30, 107, 82, 0.12)",
+      haze: "#9db9c0",
+      hazeDark: "#7ba0aa",
+      ink: "#14262e",
+      muted: "#5b6e77",
+      grid: "#e3eaec"
+    };
+    const TYPE_COLORS = ["#1e6b52", "#7ba0aa", "#c98a00", "#14262e", "#6e8f7d", "#b5654a"];
+
+    const MAP_STYLES = [
+      { featureType: "poi", stylers: [{ visibility: "off" }] },
+      { featureType: "transit", stylers: [{ visibility: "off" }] },
+      { featureType: "road", stylers: [{ visibility: "simplified" }] },
+      { featureType: "landscape", elementType: "geometry", stylers: [{ color: "#eef2ef" }] },
+      { featureType: "water", elementType: "geometry", stylers: [{ color: "#c5d8df" }] },
+      { featureType: "administrative", elementType: "geometry.stroke", stylers: [{ color: "#9db9c0" }] }
+    ];
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const numberFormat = new Intl.NumberFormat("en-GB");
+    const monthShort = new Intl.DateTimeFormat("en-GB", { month: "short", year: "numeric" });
+    const monthLong = new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric" });
+
+    let map = null;
+    let markers = [];
+    let typeChart = null;
+    let growthChart = null;
+    let growthView = "both";
+    let latestSeries = [];
+
+    const $ = id => document.getElementById(id);
+    const formatNumber = n => numberFormat.format(n);
+
+    /* ---------- Loading, caching, cleaning ---------- */
 
     function showError(message) {
-      const el = document.getElementById("loadError");
+      const el = $("loadError");
       el.textContent = message;
       el.hidden = false;
+    }
+
+    function hideError() {
+      $("loadError").hidden = true;
     }
 
     function readCache() {
@@ -239,18 +610,25 @@
       }
     }
 
-    // Live data first; fall back to the last good copy if the feed is slow or down.
-    async function loadData() {
+    async function fetchLive() {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
       try {
-        const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
         const response = await fetch(DATA_URL, { signal: controller.signal });
-        clearTimeout(timer);
         if (!response.ok) throw new Error("HTTP " + response.status);
         const data = await response.json();
         if (!Array.isArray(data)) throw new Error("Unexpected data format");
         writeCache(data);
         return data;
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+
+    // Live data first; fall back to the last good copy if the feed is slow or down.
+    async function loadData() {
+      try {
+        return await fetchLive();
       } catch (err) {
         console.error("Could not load live data:", err);
         const cached = readCache();
@@ -317,111 +695,371 @@
       return String(row["geocode_quality"] || "").toUpperCase() !== "VAGUE";
     }
 
-    async function initMap() {
-      const data = await loadData();
-      if (!data) return;
+    /* ---------- Monthly series ---------- */
 
-      if (!window.google || !google.maps) {
-        showError("The map could not be loaded. Please refresh the page.");
+    // The feed sends ISO strings; sheet-style "M/D/YYYY H:mm" text is also accepted.
+    function parseTimestamp(value) {
+      if (value instanceof Date) return isNaN(value) ? null : value;
+      if (typeof value === "number") return new Date(value);
+      const text = String(value || "").trim();
+      if (!text) return null;
+      const us = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2}))?/);
+      const date = us
+        ? new Date(+us[3], +us[1] - 1, +us[2], +(us[4] || 0), +(us[5] || 0))
+        : new Date(text);
+      return isNaN(date) ? null : date;
+    }
+
+    // One entry per calendar month from the first submission to the current month, gaps included.
+    function buildMonthlySeries(data, now = new Date()) {
+      const months = new Map();
+      let first = Infinity;
+
+      data.forEach(row => {
+        const date = parseTimestamp(row["Timestamp"]);
+        if (!date) return;
+        const index = date.getFullYear() * 12 + date.getMonth();
+        const entry = months.get(index) || { students: 0, schools: 0 };
+        entry.students += parseViewers(row[VIEWERS_KEY]);
+        entry.schools += 1;
+        months.set(index, entry);
+        first = Math.min(first, index);
+      });
+
+      if (!months.size) return [];
+
+      const last = Math.max(now.getFullYear() * 12 + now.getMonth(), ...months.keys());
+      const series = [];
+      let total = 0;
+      for (let index = first; index <= last; index++) {
+        const entry = months.get(index) || { students: 0, schools: 0 };
+        const previousTotal = total;
+        total += entry.students;
+        series.push({
+          date: new Date(Math.floor(index / 12), index % 12, 1),
+          added: entry.students,
+          schools: entry.schools,
+          total,
+          growth: previousTotal > 0 ? (entry.students / previousTotal) * 100 : null
+        });
+      }
+      return series;
+    }
+
+    function formatGrowth(growth) {
+      if (growth === null) return "–";
+      return (growth > 0 ? "+" : "") + growth.toFixed(1) + "%";
+    }
+
+    /* ---------- Rendering ---------- */
+
+    function setNumber(el, target) {
+      const from = Number(el.dataset.value || 0);
+      el.dataset.value = target;
+      cancelAnimationFrame(el._frame);
+      if (reduceMotion || from === target) {
+        el.textContent = formatNumber(target);
+        return;
+      }
+      const start = performance.now();
+      const duration = 1000;
+      const step = now => {
+        const progress = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        el.textContent = formatNumber(Math.round(from + (target - from) * eased));
+        if (progress < 1) el._frame = requestAnimationFrame(step);
+      };
+      el._frame = requestAnimationFrame(step);
+    }
+
+    function renderCounters(data, series) {
+      let totalStudents = 0;
+      data.forEach(row => { totalStudents += parseViewers(row[VIEWERS_KEY]); });
+
+      setNumber($("kpiSchools"), data.length);
+      setNumber($("kpiStudents"), totalStudents);
+
+      if (!series.length) {
+        $("kpiMonth").textContent = "–";
+        $("kpiMonthNote").textContent = "";
+        $("kpiSince").textContent = "–";
+        $("kpiSinceNote").textContent = "";
         return;
       }
 
-      const map = new google.maps.Map(document.getElementById("map"), {
-        zoom: 4,
-        center: { lat: 23.5, lng: 80 },
-        minZoom: 2,
-        maxZoom: 20,
-        styles: [
-          { featureType: "poi", stylers: [{ visibility: "off" }] },
-          { featureType: "road", stylers: [{ visibility: "simplified" }] },
-        ]
-      });
+      const latest = series[series.length - 1];
+      const first = series[0];
+      $("kpiMonthLabel").textContent = "Added in " + monthShort.format(latest.date);
+      setNumber($("kpiMonth"), latest.added);
+      $("kpiMonthNote").textContent = latest.growth === null ? "" : formatGrowth(latest.growth) + " on the previous total";
+      $("kpiSince").textContent = monthShort.format(first.date);
+      $("kpiSinceNote").textContent = series.length + (series.length === 1 ? " month" : " months") + " of data";
+    }
 
-      document.getElementById("counters").style.animation = "fadeInUp 1s forwards";
-      document.getElementById("map").style.animation = "fadeInUp 1.2s forwards";
-      document.getElementById("schoolName").style.animation = "fadeInUp 1.4s forwards";
-
-      const totalOrganizations = data.length;
-      let totalViewers = 0;
-      data.forEach(row => {
-        totalViewers += parseViewers(row["Number of individuals who watched the video"]);
-      });
-
-      const countersEl = document.getElementById("counters");
-      let displayOrgs = 0;
-      let displayViewers = 0;
-      const steps = 60;
-      let frame = 0;
-      const counterAnim = setInterval(() => {
-        frame++;
-        displayOrgs = Math.floor((totalOrganizations / steps) * frame);
-        displayViewers = Math.floor((totalViewers / steps) * frame);
-        countersEl.textContent = `🏢 Schools: ${displayOrgs} | 👁️ Students: ${displayViewers}`;
-        if (frame >= steps) {
-          countersEl.textContent = `🏢 Schools: ${totalOrganizations} | 👁️ Students: ${totalViewers}`;
-          clearInterval(counterAnim);
+    function addMarker(name, lat, lng) {
+      const marker = new google.maps.Marker({
+        position: { lat, lng },
+        map,
+        title: name,
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 8,
+          fillColor: COLORS.canopy,
+          fillOpacity: 0.92,
+          strokeColor: "#ffffff",
+          strokeWeight: 2
         }
-      }, 25);
+      });
 
-      // Map markers
+      // Built with textContent so submitted names can never inject HTML.
+      const popup = document.createElement("div");
+      popup.textContent = name;
+      popup.style.cssText = "font:600 15px Inter,sans-serif;color:#14262e;padding:6px 10px;text-align:center;";
+
+      const infoWindow = new google.maps.InfoWindow({ content: popup, disableAutoPan: true });
+      marker.addListener("mouseover", () => infoWindow.open(map, marker));
+      marker.addListener("mouseout", () => infoWindow.close());
+      return marker;
+    }
+
+    function renderMarkers(data) {
+      if (!map) return;
+      markers.forEach(marker => marker.setMap(null));
+      markers = [];
       data.forEach(row => {
         const lat = parseFloat(row["lat"]);
         const lng = parseFloat(row["lng"]);
-        const name = displayName(row);
-        if (hasUsableLocation(row, lat, lng)) {
-          const marker = new google.maps.Marker({
-            position: { lat, lng },
-            map,
-            title: name,
-            icon: { url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png" }
-          });
-
-          // Built with textContent so submitted names can never inject HTML.
-          const popup = document.createElement("div");
-          popup.textContent = name;
-          popup.style.cssText = "font-size:18px;font-weight:700;font-family:'Inter',sans-serif;" +
-            "color:#1a1a1a;background:rgba(255,255,255,0.95);padding:10px 15px;border-radius:10px;" +
-            "box-shadow:0 4px 12px rgba(0,0,0,0.2);text-align:center;";
-
-          const infoWindow = new google.maps.InfoWindow({
-            content: popup,
-            disableAutoPan: true
-          });
-
-          marker.addListener("mouseover", () => infoWindow.open(map, marker));
-          marker.addListener("mouseout", () => infoWindow.close());
-        }
+        if (!hasUsableLocation(row, lat, lng)) return;
+        markers.push(addMarker(displayName(row), lat, lng));
       });
+    }
 
-      // Pie chart
-      const orgCounts = {};
+    function renderTypeChart(data) {
+      const counts = {};
       data.forEach(row => {
         const type = row["Type of organisation"] || "Other";
-        orgCounts[type] = (orgCounts[type] || 0) + 1;
+        counts[type] = (counts[type] || 0) + 1;
       });
+      const labels = Object.keys(counts);
+      const values = Object.values(counts);
 
-      new Chart(document.getElementById('orgPieChart').getContext('2d'), {
-        type: 'pie',
+      if (typeChart) {
+        typeChart.data.labels = labels;
+        typeChart.data.datasets[0].data = values;
+        typeChart.update();
+        return;
+      }
+
+      typeChart = new Chart($("orgPieChart").getContext("2d"), {
+        type: "doughnut",
         data: {
-          labels: Object.keys(orgCounts),
+          labels,
           datasets: [{
-            data: Object.values(orgCounts),
-            backgroundColor: ['#007bff', '#00c6ff', '#ff7f50', '#ffc107', '#28a745', '#6f42c1'],
-            borderColor: '#fff',
+            data: values,
+            backgroundColor: TYPE_COLORS,
+            borderColor: "#ffffff",
             borderWidth: 2
           }]
         },
         options: {
           responsive: true,
+          maintainAspectRatio: false,
+          cutout: "58%",
           plugins: {
-            legend: { position: 'bottom' },
-            tooltip: { mode: 'index', intersect: false }
+            legend: { position: "right", labels: { usePointStyle: true, boxWidth: 8, color: COLORS.ink } },
+            tooltip: {
+              callbacks: {
+                label: ctx => " " + ctx.label + ": " + formatNumber(ctx.parsed) + (ctx.parsed === 1 ? " organisation" : " organisations")
+              }
+            }
           }
         }
       });
     }
 
-    window.onload = initMap;
+    function applyGrowthView() {
+      document.querySelectorAll(".segmented button").forEach(button => {
+        button.setAttribute("aria-pressed", String(button.dataset.view === growthView));
+      });
+      if (!growthChart) return;
+      growthChart.setDatasetVisibility(0, growthView !== "total");
+      growthChart.setDatasetVisibility(1, growthView !== "monthly");
+      growthChart.update();
+    }
+
+    function renderGrowthTable(series) {
+      const body = $("growthRows");
+      body.textContent = "";
+      series.forEach(item => {
+        const row = document.createElement("tr");
+        const cells = [
+          monthLong.format(item.date),
+          formatNumber(item.schools),
+          formatNumber(item.added),
+          formatNumber(item.total),
+          formatGrowth(item.growth)
+        ];
+        cells.forEach((text, index) => {
+          const cell = document.createElement("td");
+          cell.textContent = text;
+          if (index === 4 && item.growth > 0) cell.className = "positive";
+          row.appendChild(cell);
+        });
+        body.appendChild(row);
+      });
+    }
+
+    function renderGrowthStats(series) {
+      const latest = series[series.length - 1];
+      const peak = series.reduce((best, item) => (item.added > best.added ? item : best), series[0]);
+
+      $("gsTotal").textContent = formatNumber(latest.total);
+      $("gsLatestLabel").textContent = "Added in " + monthShort.format(latest.date);
+      $("gsLatest").textContent = "+" + formatNumber(latest.added);
+      $("gsPeak").textContent = peak.added > 0
+        ? monthShort.format(peak.date) + " (+" + formatNumber(peak.added) + ")"
+        : "–";
+    }
+
+    function renderGrowth(series) {
+      const empty = !series.length;
+      $("growthEmpty").hidden = !empty;
+      $("growthContent").hidden = empty;
+      if (empty) return;
+
+      renderGrowthStats(series);
+      renderGrowthTable(series);
+
+      const labels = series.map(item => monthShort.format(item.date));
+      const added = series.map(item => item.added);
+      const totals = series.map(item => item.total);
+      const latest = series[series.length - 1];
+      $("growthChart").setAttribute(
+        "aria-label",
+        "Chart of students who watched the video by month, from " + labels[0] + " to " +
+          labels[labels.length - 1] + ". The running total reaches " + formatNumber(latest.total) + " students."
+      );
+
+      if (growthChart) {
+        growthChart.data.labels = labels;
+        growthChart.data.datasets[0].data = added;
+        growthChart.data.datasets[1].data = totals;
+        growthChart.update();
+        return;
+      }
+
+      growthChart = new Chart($("growthChart").getContext("2d"), {
+        data: {
+          labels,
+          datasets: [
+            {
+              type: "bar",
+              label: "Students added in the month",
+              data: added,
+              backgroundColor: COLORS.haze,
+              hoverBackgroundColor: COLORS.hazeDark,
+              borderRadius: 3,
+              maxBarThickness: 44,
+              order: 2
+            },
+            {
+              type: "line",
+              label: "Running total",
+              data: totals,
+              borderColor: COLORS.canopy,
+              backgroundColor: COLORS.canopySoft,
+              fill: true,
+              tension: 0.25,
+              pointRadius: 4,
+              pointHoverRadius: 6,
+              pointBackgroundColor: "#ffffff",
+              pointBorderColor: COLORS.canopy,
+              pointBorderWidth: 2,
+              order: 1
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: "index", intersect: false },
+          scales: {
+            x: { grid: { display: false }, ticks: { color: COLORS.muted, maxRotation: 0, autoSkip: true } },
+            y: {
+              beginAtZero: true,
+              grid: { color: COLORS.grid },
+              border: { display: false },
+              ticks: { color: COLORS.muted, callback: value => formatNumber(value) },
+              title: { display: true, text: "Students", color: COLORS.muted }
+            }
+          },
+          plugins: {
+            legend: { position: "bottom", labels: { usePointStyle: true, boxWidth: 8, color: COLORS.ink } },
+            tooltip: {
+              callbacks: {
+                title: items => monthLong.format(latestSeries[items[0].dataIndex].date),
+                label: ctx => " " + ctx.dataset.label + ": " + formatNumber(ctx.parsed.y),
+                footer: items => {
+                  const item = latestSeries[items[0].dataIndex];
+                  return "Schools added: " + formatNumber(item.schools) + "\nGrowth on previous total: " + formatGrowth(item.growth);
+                }
+              }
+            }
+          }
+        }
+      });
+      applyGrowthView();
+    }
+
+    function render(data) {
+      latestSeries = buildMonthlySeries(data);
+      renderCounters(data, latestSeries);
+      renderMarkers(data);
+      renderTypeChart(data);
+      renderGrowth(latestSeries);
+    }
+
+    /* ---------- Start-up ---------- */
+
+    function initMap() {
+      if (!window.google || !google.maps) {
+        showError("The map could not be loaded. Please refresh the page.");
+        return;
+      }
+      map = new google.maps.Map($("map"), {
+        zoom: 4,
+        center: { lat: 23.5, lng: 80 },
+        minZoom: 2,
+        maxZoom: 20,
+        styles: MAP_STYLES
+      });
+    }
+
+    async function refresh() {
+      if (document.hidden) return;
+      try {
+        render(await fetchLive());
+        hideError();
+      } catch (err) {
+        console.error("Background refresh failed:", err);
+      }
+    }
+
+    async function start() {
+      document.querySelectorAll(".segmented button").forEach(button => {
+        button.addEventListener("click", () => {
+          growthView = button.dataset.view;
+          applyGrowthView();
+        });
+      });
+
+      initMap();
+      const data = await loadData();
+      if (data) render(data);
+      setInterval(refresh, REFRESH_MS);
+    }
+
+    window.onload = start;
   </script>
 </body>
 </html>
