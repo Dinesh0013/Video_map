@@ -90,7 +90,7 @@
       color: #c9d8dd;
     }
 
-    .hero-body { padding: 56px 0 104px; }
+    .hero-body { padding: 44px 0 96px; }
 
     .hero h1 {
       font-family: var(--serif);
@@ -214,7 +214,6 @@
       gap: 24px;
       margin-top: 40px;
     }
-    .split.split-tight { margin-top: 24px; }
 
     .media {
       height: clamp(320px, 52vh, 520px);
@@ -304,14 +303,62 @@
     /* ---------- Lower row ---------- */
     .chart-box {
       position: relative;
-      height: 260px;
-      padding: 16px 22px 20px;
+      height: 380px;
+      padding: 12px 16px 16px;
     }
 
-    .join { background: var(--canopy-soft); border-color: #bfd9cd; }
-    .join .panel-head { border-bottom-color: #bfd9cd; }
-    .join-body { padding: 20px 22px 24px; }
-    .join-body p { max-width: 46ch; color: var(--ink-soft); }
+    #bubbleEmpty {
+      padding: 48px 22px;
+      text-align: center;
+      color: var(--muted);
+    }
+    #bubbleEmpty[hidden], .chart-box[hidden] { display: none; }
+
+    .cta-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 22px;
+      background: var(--canopy-soft);
+      border-bottom: 1px solid #bfd9cd;
+    }
+    .cta-copy { min-width: 0; }
+    .cta-copy strong {
+      display: block;
+      font-family: var(--serif);
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+    .cta-copy span { font-size: 0.9rem; color: var(--ink-soft); }
+    .cta-strip .button { margin-top: 0; white-space: nowrap; }
+
+    /* ---------- Tabs ---------- */
+    .tablist { display: flex; gap: 4px; }
+    .tablist [role="tab"] {
+      padding: 9px 16px;
+      border: 0;
+      border-bottom: 3px solid transparent;
+      background: none;
+      color: var(--muted);
+      font: 500 0.95rem var(--sans);
+      cursor: pointer;
+      transition: color 0.15s ease, border-color 0.15s ease;
+    }
+    .tablist [role="tab"]:hover { color: var(--ink); }
+    .tablist [role="tab"][aria-selected="true"] {
+      color: var(--ink);
+      border-bottom-color: var(--canopy);
+    }
+    [role="tabpanel"][hidden] { display: none; }
+
+    .schools-meta {
+      padding: 14px 22px 0;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    td.wrap-text { white-space: normal; min-width: 200px; }
+    td.muted { color: var(--muted); }
 
     .button {
       display: inline-block;
@@ -338,6 +385,7 @@
     /* ---------- Responsive ---------- */
     @media (max-width: 900px) {
       .split { grid-template-columns: 1fr; margin-top: 24px; }
+      .map-panel { order: -1; }
       #counters { grid-template-columns: repeat(2, 1fr); }
       .kpi:nth-child(3) { border-left: 0; }
       .kpi:nth-child(n+3) { border-top: 1px solid var(--line); }
@@ -356,7 +404,11 @@
       .table-wrap { margin: 12px 16px 16px; }
       #schoolName { padding: 12px 16px; }
       .chart-box { padding: 12px 16px 16px; }
-      .join-body { padding: 16px; }
+      .chart-box { height: 320px; }
+      .cta-strip { flex-direction: column; align-items: stretch; padding: 14px 16px; }
+      .tablist { width: 100%; }
+      .tablist [role="tab"] { flex: 1; padding: 9px 8px; }
+      .schools-meta { padding: 12px 16px 0; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -434,12 +486,19 @@
         </div>
       </section>
 
-      <section class="panel" aria-labelledby="mapTitle">
+      <section class="panel map-panel" aria-labelledby="mapTitle">
         <div class="panel-head">
           <div>
             <h2 id="mapTitle">Where it has been watched</h2>
             <p>Each pin is a participating school or organisation.</p>
           </div>
+        </div>
+        <div class="cta-strip">
+          <div class="cta-copy">
+            <strong>Add your school to the map</strong>
+            <span>Fill in the form (takes less than a minute) to mark your organisation and be part of a growing impact.</span>
+          </div>
+          <a class="button" href="https://forms.gle/Vt81efP2fELoPS5H7" target="_blank" rel="noopener">Open the form</a>
         </div>
         <div class="media"><div id="map" role="region" aria-label="Map of participating schools"></div></div>
         <div id="schoolName">Hover over a pin to see the organisation name</div>
@@ -449,59 +508,64 @@
     <section class="panel section-gap" aria-labelledby="growthTitle">
       <div class="panel-head">
         <div>
-          <h2 id="growthTitle">Monthly student growth</h2>
-          <p>Students who have watched the video, calculated from each submission's date.</p>
+          <h2 id="growthTitle">Student reach</h2>
+          <p>Students who have watched the video, calculated from each school's submission date.</p>
+        </div>
+        <div class="tablist" role="tablist" aria-label="Student reach views">
+          <button type="button" role="tab" id="tabGrowth" aria-controls="panelGrowth" aria-selected="true">Monthly growth</button>
+          <button type="button" role="tab" id="tabSchools" aria-controls="panelSchools" aria-selected="false" tabindex="-1">Schools</button>
         </div>
       </div>
 
-      <dl class="growth-stats">
-        <div class="growth-stat"><dt>Total students</dt><dd id="gsTotal">&ndash;</dd></div>
-        <div class="growth-stat"><dt id="gsLatestLabel">Added this month</dt><dd id="gsLatest">&ndash;</dd></div>
-        <div class="growth-stat"><dt>Strongest month</dt><dd id="gsPeak">&ndash;</dd></div>
-      </dl>
+      <div role="tabpanel" id="panelGrowth" aria-labelledby="tabGrowth">
+        <dl class="growth-stats">
+          <div class="growth-stat"><dt>Total students</dt><dd id="gsTotal">&ndash;</dd></div>
+          <div class="growth-stat"><dt id="gsLatestLabel">Added this month</dt><dd id="gsLatest">&ndash;</dd></div>
+          <div class="growth-stat"><dt>Strongest month</dt><dd id="gsPeak">&ndash;</dd></div>
+        </dl>
 
-      <div id="growthEmpty" hidden>No dated submissions yet, so there is nothing to chart. The chart appears as soon as the first response arrives.</div>
+        <div id="growthEmpty" hidden>No dated submissions yet, so there is nothing to chart. The chart appears as soon as the first response arrives.</div>
 
-      <div id="growthContent">
-        <div class="chart-area">
-          <div class="chart-canvas"><canvas id="growthChart" role="img" aria-label="Running total of students who watched the video, by month"></canvas></div>
+        <div id="growthContent">
+          <div class="chart-area">
+            <div class="chart-canvas"><canvas id="growthChart" role="img" aria-label="Running total of students who watched the video, by month"></canvas></div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <caption>Monthly figures</caption>
+              <thead>
+                <tr><th scope="col">Month</th><th scope="col">Schools added</th><th scope="col">Students added</th><th scope="col">Running total</th><th scope="col">Growth</th></tr>
+              </thead>
+              <tbody id="growthRows"></tbody>
+            </table>
+          </div>
         </div>
+      </div>
+
+      <div role="tabpanel" id="panelSchools" aria-labelledby="tabSchools" hidden>
+        <p class="schools-meta" id="schoolsMeta"></p>
         <div class="table-wrap">
           <table>
-            <caption>Monthly figures</caption>
+            <caption>Schools, newest first</caption>
             <thead>
-              <tr><th scope="col">Month</th><th scope="col">Schools added</th><th scope="col">Students added</th><th scope="col">Running total</th><th scope="col">Growth</th></tr>
+              <tr><th scope="col">School</th><th scope="col">Date added</th><th scope="col">Students who watched</th></tr>
             </thead>
-            <tbody id="growthRows"></tbody>
+            <tbody id="schoolRows"></tbody>
           </table>
         </div>
       </div>
     </section>
 
-    <div class="split split-tight">
-      <section class="panel" aria-labelledby="typeTitle">
-        <div class="panel-head">
-          <div>
-            <h2 id="typeTitle">Who is taking part</h2>
-            <p>Participating organisations by type.</p>
-          </div>
+    <section class="panel section-gap" aria-labelledby="bubbleTitle">
+      <div class="panel-head">
+        <div>
+          <h2 id="bubbleTitle">Reach by school</h2>
+          <p>Each bubble is a school. Its area shows how many students watched the video. Hover for details.</p>
         </div>
-        <div class="chart-box"><canvas id="orgPieChart" role="img" aria-label="Participating organisations by type"></canvas></div>
-      </section>
-
-      <section class="panel join" aria-labelledby="joinTitle">
-        <div class="panel-head">
-          <div>
-            <h2 id="joinTitle">Add your school to the map</h2>
-            <p>Takes less than a minute.</p>
-          </div>
-        </div>
-        <div class="join-body">
-          <p>Fill in the form to mark your organisation on the map and be part of a growing impact.</p>
-          <a class="button" href="https://forms.gle/Vt81efP2fELoPS5H7" target="_blank" rel="noopener">Open the form</a>
-        </div>
-      </section>
-    </div>
+      </div>
+      <div id="bubbleEmpty" hidden>No schools yet. Bubbles appear as soon as the first response arrives.</div>
+      <div class="chart-box" id="bubbleBox"><canvas id="bubbleChart" role="img" aria-label="Bubble chart of participating schools, sized by the number of students who watched the video"></canvas></div>
+    </section>
   </main>
 
   <footer>
@@ -524,7 +588,7 @@
       muted: "#5b6e77",
       grid: "#e3eaec"
     };
-    const TYPE_COLORS = ["#1e6b52", "#7ba0aa", "#c98a00", "#14262e", "#6e8f7d", "#b5654a"];
+    const MIN_BUBBLE_UNITS = 0.16;
 
     const MAP_STYLES = [
       { featureType: "poi", stylers: [{ visibility: "off" }] },
@@ -539,10 +603,12 @@
     const numberFormat = new Intl.NumberFormat("en-GB");
     const monthShort = new Intl.DateTimeFormat("en-GB", { month: "short", year: "numeric" });
     const monthLong = new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric" });
+    const dayFormat = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" });
 
     let map = null;
     let markers = [];
-    let typeChart = null;
+    let bubbleChart = null;
+    let bubbleItems = [];
     let growthChart = null;
     let latestSeries = [];
 
@@ -801,46 +867,242 @@
       });
     }
 
-    function renderTypeChart(data) {
-      const counts = {};
-      data.forEach(row => {
-        const type = row["Type of organisation"] || "Other";
-        counts[type] = (counts[type] || 0) + 1;
+    /* ---------- School bubbles ---------- */
+
+    // True when the form gave a usable number (or an explicit 0), false for blanks and rejected values.
+    function viewersReported(raw, count) {
+      return count > 0 || String(raw).trim() === "0";
+    }
+
+    // Greedy spiral packing: each circle goes to the first free spot nearest the centre.
+    function packCircles(radii, gap = 0.06) {
+      const order = radii.map((r, i) => i).sort((a, b) => radii[b] - radii[a]);
+      const spots = new Array(radii.length);
+      const placed = [];
+      order.forEach(i => {
+        let angle = 0;
+        let distance = 0;
+        while (placed.length) {
+          const x = Math.cos(angle) * distance;
+          const y = Math.sin(angle) * distance;
+          const free = placed.every(j => Math.hypot(x - spots[j].x, y - spots[j].y) >= radii[i] + radii[j] + gap);
+          if (free) {
+            spots[i] = { x, y };
+            break;
+          }
+          angle += 0.5;
+          distance += 0.012;
+        }
+        if (!spots[i]) spots[i] = { x: 0, y: 0 };
+        placed.push(i);
       });
-      const labels = Object.keys(counts);
-      const values = Object.values(counts);
+      return spots;
+    }
 
-      if (typeChart) {
-        typeChart.data.labels = labels;
-        typeChart.data.datasets[0].data = values;
-        typeChart.update();
-        return;
-      }
+    // Area is proportional to students, so radius follows the square root.
+    function buildBubbleItems(data) {
+      const items = data.map(row => {
+        const raw = row[VIEWERS_KEY];
+        const students = parseViewers(raw);
+        return {
+          name: displayName(row),
+          students,
+          reported: viewersReported(raw, students),
+          date: parseTimestamp(row["Timestamp"])
+        };
+      });
+      const maxStudents = Math.max(1, ...items.map(item => item.students));
+      items.forEach(item => {
+        item.ru = Math.max(MIN_BUBBLE_UNITS, Math.sqrt(item.students / maxStudents));
+      });
+      const spots = packCircles(items.map(item => item.ru));
+      items.forEach((item, index) => {
+        item.ux = spots[index].x;
+        item.uy = spots[index].y;
+      });
+      return items;
+    }
 
-      typeChart = new Chart($("orgPieChart").getContext("2d"), {
-        type: "doughnut",
-        data: {
-          labels,
-          datasets: [{
-            data: values,
-            backgroundColor: TYPE_COLORS,
-            borderColor: "#ffffff",
-            borderWidth: 2
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          cutout: "58%",
-          plugins: {
-            legend: { position: "right", labels: { usePointStyle: true, boxWidth: 8, color: COLORS.ink } },
-            tooltip: {
-              callbacks: {
-                label: ctx => " " + ctx.label + ": " + formatNumber(ctx.parsed) + (ctx.parsed === 1 ? " organisation" : " organisations")
+    // Fits the packed layout to the canvas; called on data changes and on every resize.
+    function layoutBubbles(width, height) {
+      if (!bubbleChart || !bubbleItems.length || !width || !height) return;
+
+      const box = stretch => bubbleItems.reduce((b, item) => ({
+        minX: Math.min(b.minX, item.ux * stretch - item.ru),
+        maxX: Math.max(b.maxX, item.ux * stretch + item.ru),
+        minY: Math.min(b.minY, item.uy - item.ru),
+        maxY: Math.max(b.maxY, item.uy + item.ru)
+      }), { minX: Infinity, maxX: -Infinity, minY: Infinity, maxY: -Infinity });
+
+      // Spread horizontally on wide canvases; stretching only increases gaps, so bubbles never overlap.
+      const base = box(1);
+      const wanted = (width / height) / ((base.maxX - base.minX) / (base.maxY - base.minY));
+      const stretch = Math.min(Math.max(wanted, 1), 4);
+      const b = box(stretch);
+
+      const cx = (b.minX + b.maxX) / 2;
+      const cy = (b.minY + b.maxY) / 2;
+      const boxWidth = b.maxX - b.minX;
+      const boxHeight = b.maxY - b.minY;
+      const maxRadius = Math.max(...bubbleItems.map(item => item.ru));
+
+      const dataset = bubbleChart.data.datasets[0];
+      dataset.backgroundColor = bubbleItems.map(item => item.reported ? "rgba(30, 107, 82, 0.6)" : "rgba(123, 160, 170, 0.55)");
+      dataset.borderColor = bubbleItems.map(item => item.reported ? COLORS.canopy : "#7ba0aa");
+      dataset.hoverBackgroundColor = bubbleItems.map(item => item.reported ? "rgba(30, 107, 82, 0.9)" : "rgba(123, 160, 170, 0.85)");
+
+      // Chart.js insets the plot area by roughly the largest bubble radius, so measure that inset
+      // once, then solve for the pixels-per-unit that fits the layout exactly.
+      const draw = (k, areaWidth, areaHeight) => {
+        dataset.data = bubbleItems.map(item => ({
+          x: item.ux * stretch,
+          y: item.uy,
+          r: item.ru * k,
+          name: item.name,
+          students: item.students,
+          reported: item.reported,
+          date: item.date
+        }));
+        const scales = bubbleChart.options.scales;
+        scales.x.min = cx - areaWidth / (2 * k);
+        scales.x.max = cx + areaWidth / (2 * k);
+        scales.y.min = cy - areaHeight / (2 * k);
+        scales.y.max = cy + areaHeight / (2 * k);
+        bubbleChart.update("none");
+        const area = bubbleChart.chartArea;
+        return { width: area.right - area.left, height: area.bottom - area.top, inset: area.left };
+      };
+
+      const pad = 8;
+      const probeK = 10;
+      const probe = draw(probeK, width, height);
+      const insetFactor = probe.inset / (maxRadius * probeK);
+      const k = Math.min(
+        (width - 2 * pad) / (boxWidth + 2 * insetFactor * maxRadius),
+        (height - 2 * pad) / (boxHeight + 2 * insetFactor * maxRadius)
+      );
+      const fitted = draw(k, width, height);
+      draw(k, fitted.width, fitted.height);
+    }
+
+    function renderBubbles(data) {
+      const empty = !data.length;
+      $("bubbleEmpty").hidden = !empty;
+      $("bubbleBox").hidden = empty;
+      bubbleItems = empty ? [] : buildBubbleItems(data);
+      if (empty) return;
+
+      if (!bubbleChart) {
+        bubbleChart = new Chart($("bubbleChart").getContext("2d"), {
+          type: "bubble",
+          data: {
+            datasets: [{
+              label: "Schools",
+              data: [],
+              borderWidth: 1.5,
+              hoverBorderWidth: 3,
+              hoverRadius: 4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: reduceMotion ? false : { duration: 400 },
+            layout: { padding: 0 },
+            onResize: (chart, size) => layoutBubbles(size.width, size.height),
+            scales: {
+              x: { display: false, grid: { display: false } },
+              y: { display: false, grid: { display: false } }
+            },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                displayColors: false,
+                callbacks: {
+                  title: items => items[0].raw.name,
+                  label: ctx => ctx.raw.reported
+                    ? formatNumber(ctx.raw.students) + (ctx.raw.students === 1 ? " student" : " students")
+                    : "Student count not reported",
+                  afterLabel: ctx => ctx.raw.date ? "Added " + dayFormat.format(ctx.raw.date) : ""
+                }
               }
             }
           }
-        }
+        });
+      }
+      layoutBubbles(bubbleChart.width, bubbleChart.height);
+    }
+
+    /* ---------- Schools tab ---------- */
+
+    function renderSchools(data) {
+      const time = date => (date ? date.getTime() : 0);
+      const schools = data
+        .map(row => {
+          const raw = row[VIEWERS_KEY];
+          const students = parseViewers(raw);
+          return {
+            name: displayName(row),
+            date: parseTimestamp(row["Timestamp"]),
+            students,
+            reported: viewersReported(raw, students)
+          };
+        })
+        .sort((a, b) => time(b.date) - time(a.date));
+
+      const totalStudents = schools.reduce((sum, school) => sum + school.students, 0);
+      $("schoolsMeta").textContent = formatNumber(schools.length) + (schools.length === 1 ? " school" : " schools") +
+        " and " + formatNumber(totalStudents) + " students, newest first.";
+
+      const body = $("schoolRows");
+      body.textContent = "";
+      schools.forEach(school => {
+        const row = document.createElement("tr");
+        const cells = [
+          { text: school.name, className: "wrap-text" },
+          { text: school.date ? dayFormat.format(school.date) : "\u2013" },
+          school.reported
+            ? { text: formatNumber(school.students) }
+            : { text: "Not reported", className: "muted" }
+        ];
+        cells.forEach(({ text, className }) => {
+          const cell = document.createElement("td");
+          cell.textContent = text;
+          if (className) cell.className = className;
+          row.appendChild(cell);
+        });
+        body.appendChild(row);
+      });
+    }
+
+    /* ---------- Tabs ---------- */
+
+    function initTabs() {
+      const tabs = Array.from(document.querySelectorAll('[role="tab"]'));
+      const select = tab => {
+        tabs.forEach(item => {
+          const active = item === tab;
+          item.setAttribute("aria-selected", String(active));
+          item.tabIndex = active ? 0 : -1;
+          $(item.getAttribute("aria-controls")).hidden = !active;
+        });
+        if (growthChart) growthChart.resize();
+      };
+      tabs.forEach((tab, index) => {
+        tab.addEventListener("click", () => select(tab));
+        tab.addEventListener("keydown", event => {
+          const last = tabs.length - 1;
+          const target = {
+            ArrowRight: index === last ? 0 : index + 1,
+            ArrowLeft: index === 0 ? last : index - 1,
+            Home: 0,
+            End: last
+          }[event.key];
+          if (target === undefined) return;
+          event.preventDefault();
+          tabs[target].focus();
+          select(tabs[target]);
+        });
       });
     }
 
@@ -958,7 +1220,8 @@
       latestSeries = buildMonthlySeries(data);
       renderCounters(data, latestSeries);
       renderMarkers(data);
-      renderTypeChart(data);
+      renderBubbles(data);
+      renderSchools(data);
       renderGrowth(latestSeries);
     }
 
@@ -989,6 +1252,7 @@
     }
 
     async function start() {
+      initTabs();
       initMap();
       const data = await loadData();
       if (data) render(data);
